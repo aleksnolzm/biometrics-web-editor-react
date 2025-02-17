@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <base href="../../">
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@0.7.4/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="m-6">
+    <div style="max-width:500px">
+        <div class="my-4">
+            <label for="inpTitle" class="block mb-1">Title:</label>
+            <input id="inpTitle" type="text" value="" class="border rounded-md py-2 px-3 w-full">
+        </div>
+    </div>
+
+    <script>
+        // Clear
+        document.querySelector("#inpTitle").value = '';
+
+        // Get settings
+        var settings = parent._cb.getModuleSettings();
+        try {
+            var json = JSON.parse(settings);
+            document.querySelector("#inpTitle").value = json.myname;
+        } catch (e) { }
+        
+        function construct() {
+            
+            // Save HTML
+            var html = `
+            <h2 id="{id}">${document.querySelector("#inpTitle").value}</h2>
+
+            <scr`+`ipt>
+                (function() {
+                    let docReady = function(fn) {
+                        let stateCheck = setInterval(function() {
+                            if (document.readyState !== "complete") return;
+                            clearInterval(stateCheck);
+                            try {
+                                fn()
+                            } catch (e) {}
+                        }, 1);
+                    };
+                    docReady(function() {
+
+                        // Your code here
+                        document.querySelector("#{id}").style.color = 'blue';
+
+                    });
+                })();
+            </scr`+`ipt>
+            `;
+            parent._cb.setModuleHtml(html); 
+
+            // Save settings
+            var settings = {};
+            settings.myname = document.querySelector("#inpTitle").value;
+            parent._cb.setModuleSettings(JSON.stringify(settings));
+        }
+    </script>
+</body>
+</html>

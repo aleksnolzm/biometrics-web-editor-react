@@ -1,0 +1,119 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <style>
+
+    </style>
+</head>
+<body>
+
+    <label for="inpLogoText"><span data-lang>Logo Text</span>:</label>
+    <input id="inpLogoText" type="text" />
+
+    <script>
+        var docReady = function (fn) {
+            var stateCheck = setInterval(function () {
+                if (document.readyState !== "complete") return;
+                clearInterval(stateCheck);
+                fn();
+            }, 1);
+        };
+        docReady(function () {
+            // Read settings (from data-settings attribute)
+            var settings = getSettings();
+            console.log(settings);
+ 
+            if (settings != 'undefined') {
+                var json = JSON.parse(settings);
+                document.querySelector("#inpLogoText").value = json.logotext; 
+            }
+        }); 
+
+        /*
+        Use construct() function to construct html & settings
+        */
+        function construct() {
+
+            var inpLogoText = document.querySelector('#inpLogoText');
+
+            var html = `<div id="{id}" class="main-menu" style="width:100vw;height:60px;display:flex;justify-content:center;align-items:center;background:#ddd">
+                    <div>${inpLogoText.value}</div>
+                </div>
+                <scr`+`ipt>
+                    /* Custom code here */
+                    var myMenu = document.querySelector('#{id}');
+                    console.log(myMenu);
+                </scr`+`ipt>`;
+
+            // Render module
+            setHtml(html);
+
+            // Save by settings (to data-settings attribute) by calling setSettings() method.
+            var settings = {};
+            settings.logotext = document.querySelector("#inpLogoText").value;
+            settings.other = 'value';
+
+            setSettings(JSON.stringify(settings));
+        }
+
+        /* 
+        COMMON METHODS FOR MODULE.
+        */
+        function getHtml() {
+            var activeModule = parent._cb.doc.querySelector('[data-module-active]');
+            return decodeURIComponent(activeModule.getAttribute('data-html'));
+        }
+
+        function getSettings() {
+            var activeModule = parent._cb.doc.querySelector('[data-module-active]');
+            return decodeURIComponent(activeModule.getAttribute('data-settings'));
+        }
+
+        function setHtml(html) {
+            parent.document.querySelector('#hidModuleCode').value = html;
+        }
+
+        function setSettings(settings) {
+            parent.document.querySelector('#hidModuleSettings').value = settings;
+        }
+
+        function showModal(selector) {
+            let modal = document.querySelector(selector);
+            let modalClone = modal.cloneNode(true);
+            modal = parent._cb.createModal(modalClone, selector);
+            return modal;
+        }
+        function hideModal(modal) {
+            parent._cb.hideModal(modal);
+        }
+        function hasClass(elm,classname) {
+            parent._cb.dom.hasClass(elm,classname);
+        }
+        function addClass(elm,classname) {
+            parent._cb.dom.addClass(elm,classname);
+        }
+        function removeClass(elm,classname) {
+            parent._cb.dom.removeClass(elm,classname);
+        }
+
+        // Language file stuff
+        function applyLang() {
+            let elms = document.querySelectorAll('[data-lang]');
+            elms.forEach(function(elm){
+                elm.innerHTML = parent._cb.out(elm.innerHTML);
+            });
+
+            elms = document.querySelectorAll('[data-lang-title]');
+            elms.forEach(function(elm){
+                elm.setAttribute('title', parent._cb.out(elm.getAttribute('title')));
+            });
+        }
+        applyLang();
+    </script>
+
+</body>
+</html>
