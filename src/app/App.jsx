@@ -93,16 +93,17 @@ function App() {
     });
 
     // Load sample content
-    let html = `<div class="is-section is-section-100 is-box type-system-ui">
-      <div class="is-overlay"></div>
-      <div class="is-container v2 size-18 leading-14 is-content-1300">
-        <div class="row">
-          <div class="column">
-              <h1 class="leading-11 size-88">We design. We develop. We get it done — nicely.</h1>
+    let html = `
+        <div class="is-section is-section-100 is-box type-system-ui">
+          <div class="is-overlay" />
+          <div class="is-container v2 size-18 leading-14 is-content-1300">
+            <div class="row">
+              <div class="column">
+                <h1 class="leading-11 size-88">We design. We develop. We get it done — nicely.</h1>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>`;
+        </div>`;
     let mainCss = '';
     let sectionCss = '';
 
