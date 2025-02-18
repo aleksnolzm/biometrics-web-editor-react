@@ -250,7 +250,7 @@
 }
 @media all and (max-width: 1024px) {
     [data-module="slider"] {
-        min-height:70vw !important; /* Maintain proportion on small screens */ 
+        min-height:70vw !important; /* Maintain proportion on small views */
         height: auto;
     }
 }

@@ -1,9 +1,5 @@
-import { showMessage } from 'app/store/core/messageSlice';
 import _ from 'lodash';
-import history from '@history';
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { removeAuthentication } from 'app/store/auth';
 import { getErrMessages } from './handlers';
 
 const requestState = {
@@ -16,11 +12,12 @@ const defaultOptions = {
   isFile: false,
   bypass: false,
   noAuthPath: 'sign-in',
+  onError: undefined,
+  onForbidden: () => {},
 };
 
 export const useRequest = (requestFunction = () => new Promise(), entryOptions = {}) => {
   const options = _.merge(defaultOptions, entryOptions);
-  const Dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [response, setResponse] = useState();
   const [errorResponse, setErrorResponse] = useState([]);
@@ -30,11 +27,11 @@ export const useRequest = (requestFunction = () => new Promise(), entryOptions =
   useEffect(() => {
     if (status !== requestState.error && errorResponse.length < 1) return;
     const msg = errorResponse.join(' ');
-    Dispatch(
-      showMessage({
-        message: msg,
-      })
-    );
+    if (typeof options.onError === 'function') {
+      options.onError(msg);
+    } else {
+      console.error(msg);
+    }
   }, [status, errorResponse]);
 
   const makeRequest = async (...args) => {
@@ -65,8 +62,7 @@ export const useRequest = (requestFunction = () => new Promise(), entryOptions =
         .catch((error) => {
           console.log(error);
           if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-            Dispatch(removeAuthentication());
-            history.replace(options.noAuthPath);
+            options.onForbidden(error);
           }
           let filteredError = {
             code: error.code,
