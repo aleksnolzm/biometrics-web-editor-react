@@ -1,6 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
 import { useSearchParams } from "react-router-dom";
-import _ from 'lodash';
 import ContentBox from '@innovastudio/contentbox';
 import '../styles/contentbox.css';
 import '../styles/contentbuilder.css';
@@ -8,6 +7,7 @@ import { useRequest } from "@main/hooks";
 import { getContentById, updateContent } from "app/api/editor";
 import { HTML_TEMPLATE } from "app/views/Defaults";
 import {emitCustomMessage, emitErrorMessage} from "app/utils/eventMessagesHandler";
+import Loader from "app/views/Components/Loader";
 
 const EVENT_IDENTIFIER = 5849301;
 const DEFAULT_DATA = {
@@ -224,9 +224,7 @@ const Editor = () => {
 
   return (
       isLoadingShow ? (
-        <div>
-          <p>Loading...</p>
-        </div>
+        <Loader />
       ) : (
       <div className="builder-ui keep-selection custom-topbar" style={{opacity:topbarOpacity}} data-tooltip>
         <div style={{ display: 'flex', flexDirection: 'center', alignItems: 'center', textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}>

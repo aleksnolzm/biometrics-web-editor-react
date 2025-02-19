@@ -1,4 +1,4 @@
-import './AppleLoader.module.css';
+import './AppleLoader.css';
 import clsx from 'clsx';
 
 export const AppleLoader = ({ style, className, ...props }) => {
