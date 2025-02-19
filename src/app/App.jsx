@@ -15,6 +15,7 @@ function App() {
   // }, [externalDomain]);
 
   useLayoutEffect(() => {
+    console.log('baseurl loaded');
     updateBaseUrl('https://api.intranet.webdecero.dev', 'api-manager');
   }, []);
 

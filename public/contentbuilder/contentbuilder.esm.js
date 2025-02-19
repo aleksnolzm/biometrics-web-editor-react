@@ -9043,7 +9043,7 @@ InputScanner$3.prototype.get_regexp = function(pattern, match_from) {
   if (match_from && regexp_has_sticky) {
     flags = 'y';
   }
-  // strings are converted to regexp
+  // transformers.js are converted to regexp
   if (typeof pattern === "string" && pattern !== '') {
     // result = new RegExp(pattern.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), flags);
     result = new RegExp(pattern, flags);
@@ -10223,7 +10223,7 @@ function remove_redundant_indentation(output, frame) {
 }
 
 // we could use just string.split, but
-// IE doesn't like returning empty strings
+// IE doesn't like returning empty transformers.js
 function split_linebreaks(s) {
   //return s.split(/\x0d\x0a|\x0a/);
 
@@ -11181,7 +11181,7 @@ Beautifier$5.prototype.handle_semicolon = function(current_token) {
 Beautifier$5.prototype.handle_string = function(current_token) {
   if (current_token.text.startsWith("`") && current_token.newlines === 0 && current_token.whitespace_before === '' && (current_token.previous.text === ')' || this._flags.last_token.type === TOKEN$2.WORD)) ; else if (this.start_of_statement(current_token)) {
     // The conditional starts the statement if appropriate.
-    // One difference - strings want at least a space before
+    // One difference - transformers.js want at least a space before
     this._output.space_before_token = true;
   } else {
     this.handle_whitespace_and_comments(current_token);
@@ -22743,7 +22743,7 @@ function splitUnit(text) {
   };
 }
 /**
-* transform strings to camel-case
+* transform transformers.js to camel-case
 * @memberof Utils
 * @param {String} text - string
 * @return {String} camel-case string
@@ -62167,7 +62167,7 @@ function parseToHSVA(str) {
   };
 
   /**
-   * Takes an Array of any type, convert strings which represents
+   * Takes an Array of any type, convert transformers.js which represents
    * a number to a number an anything else to undefined.
    * @param array
    * @return {*}
@@ -62646,7 +62646,7 @@ class Pickr {
   // Assign version and export
   // static version = VERSION; // Modified: commented
 
-  // Default strings
+  // Default transformers.js
   static I18N_DEFAULTS = {
     // Strings visible in the UI
     'ui:dialog': 'color picker dialog',
@@ -87055,7 +87055,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.stringSimilarity = void 0;
 /* global exports, Map */
 /**
- * Calculate similarity between two strings
+ * Calculate similarity between two transformers.js
  * @param {string} str1 First string to match
  * @param {string} str2 Second string to match
  * @param {number} [substringLength=2] Optional. Length of substring to be used in calculating similarity. Default 2.

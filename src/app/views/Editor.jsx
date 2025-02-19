@@ -7,7 +7,7 @@ import '../styles/contentbuilder.css';
 import { useRequest } from "@main/hooks";
 import { getContentById, updateContent } from "app/api/editor";
 import { HTML_TEMPLATE } from "app/views/Defaults";
-import { emitErrorMessage } from "app/utils/eventMessagesHandler";
+import {emitCustomMessage, emitErrorMessage} from "app/utils/eventMessagesHandler";
 
 const EVENT_IDENTIFIER = 5849301;
 const DEFAULT_DATA = {
@@ -49,29 +49,58 @@ const Editor = () => {
     handleLoadData(successContent);
   };
 
-  const back = () => {
+  const handleResponseUpdate = (currentRes) => {
+    const { isOk, successContent } = currentRes;
+    console.log(isOk, successContent);
+    if (!isOk) return;
+    emitCustomMessage(EVENT_IDENTIFIER, 'on-update', successContent);
+  }
 
+  const handleOnShow = () => {
+    console.log('handleOnShow');
+    tryShow(externalId, 'notice')
+      .then((response) => {
+        if (!response) return;
+        handleResponseShow(response);
+      })
+      .catch(error => console.log(error));
   };
 
-  const save = (e) => {
-    window.parent.postMessage({ action: "builder-on-save", id: 5849301 }, "*");
+  const handleOnUpdate = (data) => {
+    console.log('handleOnUpdate');
+    tryUpdate(data, externalId, 'notice')
+      .then((response) => {
+        if (!response) return;
+        handleResponseUpdate(response);
+      })
+      .catch(error => console.log(error));
   };
 
-  const publish = (e) => {
-    window.parent.postMessage({ action: "builder-on-publish", id: 5849301 }, "*");
+  const handleOnBack = () => {
+    emitCustomMessage(EVENT_IDENTIFIER, 'on-back');
   };
 
-  const undo = (e) => {
+  const handleOnSave = (e) => {
+    emitCustomMessage(EVENT_IDENTIFIER, 'on-before-save');
+    const recordedLayout = {
+      html: builderRef.current.html(),
+      mainCss: builderRef.current.mainCss(),
+      sectionCss: builderRef.current.sectionCss(),
+    }
+    handleOnUpdate(recordedLayout);
+  };
+
+  const handleOnUndo = (e) => {
     if(!builderRef.current) return;
     builderRef.current.undo();
   };
 
-  const redo = (e) => {
+  const handleOnRedo = (e) => {
     if(!builderRef.current) return;
     builderRef.current.redo();
   };
 
-  const setScreenMode = (e) => {
+  const handleOnSetScreenMode = (e) => {
     if(!builderRef.current) return;
 
     document.querySelectorAll('.custom-topbar [data-device]').forEach(btn=>btn.classList.remove('on'));
@@ -83,17 +112,7 @@ const Editor = () => {
     btn.classList.add('on');
   };
 
-  const download = async () => {
-    if(!builderRef.current) return;
-    builderRef.current.download();
-  };
-
-  const viewHtml = () => {
-    if(!builderRef.current) return;
-    builderRef.current.viewHtml();
-  };
-
-  const preview = () => {
+  const handleOnPreview = () => {
     if(!builderRef.current) return;
 
     let html = builderRef.current.html();
@@ -103,12 +122,19 @@ const Editor = () => {
     let sectionCss = builderRef.current.sectionCss();
     localStorage.setItem('preview-sectioncss', sectionCss);
 
-    window.open('/preview.html', '_blank').focus();
+    emitCustomMessage(EVENT_IDENTIFIER, 'on-preview');
+    // window.open('/preview.html', '_blank').focus();
   };
 
-  const togglePanel = () => {
+  const handleOnTogglePanel = () => {
     if(!builderRef.current) return;
     builderRef.current.toggleEditPanel();
+  };
+
+  const handleOnStart = (ev) => {
+    setTopbarOpacity(1);
+    setIsReady(true);
+    emitCustomMessage(EVENT_IDENTIFIER, 'on-start');
   };
 
   useEffect(() => {
@@ -121,11 +147,7 @@ const Editor = () => {
         iframeSrc: 'blank.html',
         topSpace: true,
         iframeCentered: true,
-        onStart: ()=>{
-          console.log('on start')
-          setTopbarOpacity(1);
-          setIsReady(true);
-        },
+        onStart: handleOnStart,
         toggleDeviceButton: false,
         deviceButtons: false,
 
@@ -196,13 +218,7 @@ const Editor = () => {
 
   useEffect(() => {
     if (externalId === null || externalId === undefined) return;
-    console.log('get show');
-    tryShow(externalId, 'notice')
-      .then((response) => {
-        if (!response) return;
-        handleResponseShow(response);
-      })
-      .catch(error => console.log(error));
+    handleOnShow();
   }, [externalId]);
 
   return (
@@ -212,72 +228,63 @@ const Editor = () => {
         </div>
       ) : (
       <div className="builder-ui keep-selection custom-topbar" style={{opacity:topbarOpacity}} data-tooltip>
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'center', alignItems: 'center', textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}>
           {title}
         </div>
-        <div>
-          <button className="btn-back" onClick={back} title="Back">
+        <div style={{ maxWidth: '21rem' }}>
+          <button className="btn-back" onClick={handleOnBack} title="Regresar">
             <div dangerouslySetInnerHTML={{ __html: `
               <svg><use xlink:href="#icon-back"></use></svg>
               ` }} />
-            <span>Back</span>
+            <span>Regresar</span>
           </button>
 
-          <div className="separator"></div>
-
-          <button className="btn-undo" onClick={undo} title="Undo">
+          <button className="btn-undo" onClick={handleOnUndo} title="Deshacer">
             <div dangerouslySetInnerHTML={{ __html: `
               <svg><use xlink:href="#icon-undo"></use></svg>
               ` }} />
           </button>
 
-          <button className="btn-redo" onClick={redo} title="Redo">
+          <button className="btn-redo" onClick={handleOnRedo} title="Rehacer">
             <div dangerouslySetInnerHTML={{ __html: `
               <svg><use xlink:href="#icon-redo"></use></svg>
               ` }} />
           </button>
 
-          <button onClick={save} title="Save">
+          <button onClick={handleOnSave} title="Guardar">
             <div dangerouslySetInnerHTML={{ __html: `
               <svg><use xlink:href="#icon-save"></use></svg>
               ` }} />
-            <span>Save</span>
-          </button>
-
-          <button onClick={publish} title="Publish">
-            <div dangerouslySetInnerHTML={{ __html: `
-              <svg><use xlink:href="#icon-publish"></use></svg>
-              ` }} />
-            <span>Publish</span>
+            <span>Guardar</span>
           </button>
         </div>
-        <div>
-          <button className="btn-device-desktop-large" data-device="desktop-lg" onClick={setScreenMode} title="Desktop - Large Screen">
+        <div style={{ maxWidth: '31rem' }}>
+          <button className="btn-device-desktop-large" data-device="desktop-lg" onClick={handleOnSetScreenMode} title="Visualizar en modo Desktop">
             <div dangerouslySetInnerHTML={{ __html: `
                   <svg style="width:18px;height:18px;"><use xlink:href="#icon-device-desktop"></use></svg>
               ` }} />
           </button>
-          <button className="btn-device-desktop" data-device="desktop" onClick={setScreenMode} title="Desktop / Laptop">
+          <button className="btn-device-desktop" data-device="desktop" onClick={handleOnSetScreenMode} title="Visualizar en modo Laptop">
             <div dangerouslySetInnerHTML={{ __html: `
                   <svg style="width:18px;height:18px;"><use xlink:href="#icon-device-laptop"></use></svg>
               ` }} />
           </button>
-          <button className="btn-device-tablet-landscape" data-device="tablet-landscape" onClick={setScreenMode} title="Tablet - Landscape">
+          <button className="btn-device-tablet-landscape" data-device="tablet-landscape" onClick={handleOnSetScreenMode} title="Visualizar en modo Tablet horizontal">
             <div dangerouslySetInnerHTML={{ __html: `
               <svg style="width:18px;height:18px;transform:rotate(-90deg)"><use xlink:href="#icon-device-tablet"></use></svg>
               ` }} />
           </button>
-          <button className="btn-device-tablet" data-device="tablet" onClick={setScreenMode} title="Tablet - Portrait">
+          <button className="btn-device-tablet" data-device="tablet" onClick={handleOnSetScreenMode} title="Visualizar en modo Tablet vertical">
             <div dangerouslySetInnerHTML={{ __html: `
               <svg  style="width:18px;height:18px;"><use xlink:href="#icon-device-tablet"></use></svg>
               ` }} />
           </button>
-          <button className="btn-device-mobile" data-device="mobile" onClick={setScreenMode} title="Mobile">
+          <button className="btn-device-mobile" data-device="mobile" onClick={handleOnSetScreenMode} title="Visualizador en modo Mobile">
             <div dangerouslySetInnerHTML={{ __html: `
               <svg  style="width:18px;height:18px;"><use xlink:href="#icon-device-mobile"></use></svg>
               ` }} />
           </button>
-          <button className="btn-fullview" data-device="fullview" onClick={setScreenMode} title="Full View">
+          <button className="btn-fullview" data-device="fullview" onClick={handleOnSetScreenMode} title="Visualizador en panel completo">
             <div dangerouslySetInnerHTML={{ __html: `
               <svg  style="width:18px;height:18px;"><use xlink:href="#icon-fullview"></use></svg>
               ` }} />
@@ -285,19 +292,7 @@ const Editor = () => {
 
           <div className="separator"></div>
 
-          <button className="btn-download" onClick={download} title="Download">
-            <div dangerouslySetInnerHTML={{ __html: `
-              <svg><use xlink:href="#icon-download"></use></svg>
-              ` }} />
-          </button>
-
-          <button className="btn-html" onClick={viewHtml} title="HTML">
-            <div dangerouslySetInnerHTML={{ __html: `
-              <svg><use xlink:href="#icon-code"></use></svg>
-              ` }} />
-          </button>
-
-          <button className="btn-preview" onClick={preview} title="Preview">
+          <button className="btn-preview" onClick={handleOnPreview} title="Vista previa de contenido">
             <div dangerouslySetInnerHTML={{ __html: `
               <svg><use xlink:href="#icon-eye"></use></svg>
               ` }} />
@@ -305,7 +300,7 @@ const Editor = () => {
 
           <div className="separator"></div>
 
-          <button className="btn-togglepanel" data-button="togglepanel" onClick={togglePanel} title="Toggle Edit Panel">
+          <button className="btn-togglepanel" data-button="togglepanel" onClick={handleOnTogglePanel} title="Menu de preferencias de lienzo">
             <div dangerouslySetInnerHTML={{ __html: `
               <svg><use xlink:href="#icon-pencil"></use></svg>
               ` }} />

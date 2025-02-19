@@ -15,6 +15,7 @@ export const emitMainMessage = (identifier, dataContent) => {
 };
 
 export const emitErrorMessage = (identifier, errorContent) => {
+  console.log(errorContent);
   if (typeof identifier !== 'number') return;
   window.parent.postMessage(
     {
