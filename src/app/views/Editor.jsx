@@ -122,7 +122,7 @@ const Editor = () => {
     localStorage.setItem('preview-maincss', mainCss);
     let sectionCss = builderRef.current.sectionCss();
     localStorage.setItem('preview-sectioncss', sectionCss);
-
+    
     emitCustomMessage(EVENT_IDENTIFIER, 'preview');
   };
 
