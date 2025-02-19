@@ -21,8 +21,7 @@ function App() {
   useLayoutEffect(() => {
     if (externalDomain === null || externalDomain === undefined) return;
     updateBaseUrl(externalDomain, externalPrefix);
-  }, [externalDomain]);
-
+  }, [externalDomain, externalPrefix]);
 
   return (
     <Editor />

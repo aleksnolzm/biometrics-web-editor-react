@@ -54,7 +54,7 @@ const Editor = () => {
     const { isOk, successContent } = currentRes;
     console.log(isOk, successContent);
     if (!isOk) return;
-    emitCustomMessage(EVENT_IDENTIFIER, 'on-update', successContent);
+    emitCustomMessage(EVENT_IDENTIFIER, 'update', successContent);
   }
 
   const handleOnShow = () => {
@@ -78,11 +78,11 @@ const Editor = () => {
   };
 
   const handleOnBack = () => {
-    emitCustomMessage(EVENT_IDENTIFIER, 'on-back');
+    emitCustomMessage(EVENT_IDENTIFIER, 'back');
   };
 
   const handleOnSave = (e) => {
-    emitCustomMessage(EVENT_IDENTIFIER, 'on-before-save');
+    emitCustomMessage(EVENT_IDENTIFIER, 'before-save');
     const recordedLayout = {
       html: builderRef.current.html(),
       mainCss: builderRef.current.mainCss(),
@@ -123,8 +123,7 @@ const Editor = () => {
     let sectionCss = builderRef.current.sectionCss();
     localStorage.setItem('preview-sectioncss', sectionCss);
 
-    emitCustomMessage(EVENT_IDENTIFIER, 'on-preview');
-    // window.open('/preview.html', '_blank').focus();
+    emitCustomMessage(EVENT_IDENTIFIER, 'preview');
   };
 
   const handleOnTogglePanel = () => {
@@ -135,7 +134,7 @@ const Editor = () => {
   const handleOnStart = (ev) => {
     setTopbarOpacity(1);
     setIsReady(true);
-    emitCustomMessage(EVENT_IDENTIFIER, 'on-start');
+    emitCustomMessage(EVENT_IDENTIFIER, 'start');
   };
 
   useEffect(() => {

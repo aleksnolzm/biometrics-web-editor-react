@@ -29,7 +29,7 @@ export const emitErrorMessage = (identifier, errorContent) => {
 
 export const emitCustomMessage = (identifier, eventName, data) => {
   if (typeof identifier !== 'number') return;
-  if (typeof eventName === 'string' || eventName.length === 0) return;
+  if (typeof eventName !== 'string' || eventName.length === 0) return;
   const transformedEventName = stringToKebabCase(eventName);
   window.parent.postMessage(
     {

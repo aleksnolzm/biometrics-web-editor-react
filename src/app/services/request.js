@@ -30,10 +30,9 @@ service.interceptors.response.use((response) => {
 });
 
 export const updateBaseUrl = (baseUrl, currPrefix) => {
-  console.log(baseUrl, currPrefix);
+  console.log(`%cbaseUrl: ${baseUrl}\nprefix: ${currPrefix}`, 'background-color: rgb(12, 74, 110); color: white;');
   try {
     const prefixIsValid = typeof currPrefix === 'string' && currPrefix.trim().length > 0;
-    console.log(prefixIsValid);
     service.defaults.baseURL = `${baseUrl}${prefixIsValid ? '/' : ''}${
       prefixIsValid ? currPrefix : ''
     }`;
