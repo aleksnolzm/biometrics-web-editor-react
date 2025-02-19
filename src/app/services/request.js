@@ -30,9 +30,16 @@ service.interceptors.response.use((response) => {
 });
 
 export const updateBaseUrl = (baseUrl, currPrefix) => {
-  service.defaults.baseURL = `${baseUrl}${typeof currPrefix !== 'string' ? '' : '/'}${
-    currPrefix || ''
-  }`;
+  console.log(baseUrl, currPrefix);
+  try {
+    const prefixIsValid = typeof currPrefix === 'string' && currPrefix.trim().length > 0;
+    console.log(prefixIsValid);
+    service.defaults.baseURL = `${baseUrl}${prefixIsValid ? '/' : ''}${
+      prefixIsValid ? currPrefix : ''
+    }`;
+  } catch (e) {
+    console.error('Error updating base url', e);
+  }
 };
 
 export default service;

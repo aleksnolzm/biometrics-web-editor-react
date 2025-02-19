@@ -20,6 +20,7 @@ const DEFAULT_DATA = {
 const Editor = () => {
   const [searchParams] = useSearchParams();
   const externalId = searchParams.get('id');
+  const externalModule = searchParams.get('module');
   const builderRef = useRef(null);
 
   const [isReady, setIsReady] = useState(false);
@@ -58,7 +59,7 @@ const Editor = () => {
 
   const handleOnShow = () => {
     console.log('handleOnShow');
-    tryShow(externalId, 'notice')
+    tryShow(externalId, externalModule)
       .then((response) => {
         if (!response) return;
         handleResponseShow(response);
@@ -68,7 +69,7 @@ const Editor = () => {
 
   const handleOnUpdate = (data) => {
     console.log('handleOnUpdate');
-    tryUpdate(data, externalId, 'notice')
+    tryUpdate(data, externalId, externalModule)
       .then((response) => {
         if (!response) return;
         handleResponseUpdate(response);
