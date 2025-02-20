@@ -17,6 +17,9 @@ const DEFAULT_DATA = {
   title: 'Sin título',
 };
 
+const IS_LOCALHOST = window.origin.includes('localhost:3107');
+const ASSETS_PATH = IS_LOCALHOST ? '/assets.html' : '/editor/assets.html';
+
 const Editor = () => {
   const [searchParams] = useSearchParams();
   const externalId = searchParams.get('id');
@@ -42,7 +45,7 @@ const Editor = () => {
 
   const handleResponseShow = (currentRes) => {
     const { isOk, successContent } = currentRes;
-    console.log(isOk, successContent);
+    console.log(successContent);
     if (!isOk) {
       handleLoadData(DEFAULT_DATA);
       return;
@@ -52,7 +55,7 @@ const Editor = () => {
 
   const handleResponseUpdate = (currentRes) => {
     const { isOk, successContent } = currentRes;
-    console.log(isOk, successContent);
+    console.log(successContent);
     if (!isOk) return;
     emitCustomMessage(EVENT_IDENTIFIER, 'update', successContent);
   }
@@ -122,7 +125,7 @@ const Editor = () => {
     localStorage.setItem('preview-maincss', mainCss);
     let sectionCss = builderRef.current.sectionCss();
     localStorage.setItem('preview-sectioncss', sectionCss);
-    
+
     emitCustomMessage(EVENT_IDENTIFIER, 'preview');
   };
 
@@ -152,11 +155,11 @@ const Editor = () => {
         deviceButtons: false,
 
         // Default file/image picker
-        imageSelect: '/assets.html',
-        videoSelect: '/assets.html',
-        audioSelect: '/assets.html',
-        fileSelect: '/assets.html',
-        mediaSelect: '/assets.html',
+        imageSelect: ASSETS_PATH,
+        videoSelect: ASSETS_PATH,
+        audioSelect: ASSETS_PATH,
+        fileSelect: ASSETS_PATH,
+        mediaSelect: ASSETS_PATH,
 
         // Template Sets
         templates: [
