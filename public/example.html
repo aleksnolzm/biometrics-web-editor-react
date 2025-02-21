@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Files</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <link rel="shortcut icon" href="#" />
+
+    <link href="filemanager/files.css" rel="stylesheet">
+</head>
+<body style="touch-action: pan-y">
+
+<div class="files"></div>
+
+<script src="filemanager/files.min.js"></script>
+<script>
+    const elm = document.querySelector('.files')
+    new Files(elm, {
+
+        // Node.js endpoints, see: /server.js.
+        listFilesUrl: '/listfiles',
+        listFoldersUrl: '/listfolders',
+        deleteFilesUrl: '/deletefiles',
+        moveFilesUrl: '/movefiles',
+        createFolderUrl: '/createfolder',
+        uploadFilesUrl: '/uploadfiles',
+        renameFileUrl: '/renamefile',
+        getMmodelsUrl: '/getmodels',
+        textToImageUrl: '/texttoimage',
+        upscaleImageUrl: '/upscaleimage',
+        controlNetUrl: '/controlnet',
+        saveTextUrl: '/savetext',
+
+        folderTree: true,
+
+        // panelReverse: true,
+        // filesOnly: true,
+        // filePicker: true,
+        // onSelect: (url)=>{ },
+        // showRelativeTime: true,
+        // locale: 'default',
+        // dateShortOptions: { // Used in file list
+        //     year: 'numeric',
+        //     month: 'short',
+        //     day: 'numeric',
+        // },
+        // dateLongOptions: { // Used in file info
+        //     weekday: 'short',
+        //     year: 'numeric',
+        //     month: 'short',
+        //     day: 'numeric',
+        //     hour: 'numeric',
+        //     minute: 'numeric',
+        // },
+
+        allowedFileTypes: [
+            'image/jpeg',
+            'image/png',
+            'image/gif',
+            'image/webp',
+            'image/bmp',
+            'image/tiff',
+            'image/svg+xml',
+            'image/vnd.adobe.photoshop',
+            'video/mp4',
+            'video/quicktime',
+            'audio/mpeg',
+            'application/json',
+            'application/font',
+            'application/pdf',
+            'application/zip',
+            'application/x-rar-compressed',
+            'application/msword',
+            'application/rtf',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'text/csv',
+            'text/markdown',
+            'text/plain',
+            'text/css',
+            'text/javascript',
+            'text/html',
+        ]
+    });
+</script>
+</body>
+</html>

@@ -18,7 +18,7 @@ const DEFAULT_DATA = {
 };
 
 const IS_LOCALHOST = window.origin.includes('localhost:3107');
-const ASSETS_PATH = IS_LOCALHOST ? '/assets.html' : '/editor/assets.html';
+const ASSETS_PATH = IS_LOCALHOST ? '/files.html' : '/editor/files.html';
 
 const Editor = () => {
   const [searchParams] = useSearchParams();
@@ -151,6 +151,40 @@ const Editor = () => {
         topSpace: true,
         iframeCentered: true,
         onStart: handleOnStart,
+
+        // onImageSelectClick: (event) => {
+        //   console.log('onImageSelectClick', event);
+        //   return event;
+        //
+        // },
+        // onImageBrowseClick: (event) => {
+        //   console.log('onImageBrowseClick', event);
+        //   return event;
+        //
+        // },
+        // onImageUpload: (event) => {
+        //   console.log('onImageUpload', event.target)
+        //
+        // },
+        //
+        // onMediaSelectClick: (event) => {
+        //   console.log('onMediaSelectClick', event);
+        //
+        // },
+        // onMediaUpload: (event) => {
+        //   console.log('onMediaUpload', event);
+        //
+        // },
+        //
+        // onFileSelectClick: (event) => {
+        //   console.log('onFileSelectClick', event);
+        //
+        // },
+        // onFileUpload: (event) => {
+        //   console.log('onFileUpload', event);
+        //
+        // },
+
         toggleDeviceButton: false,
         deviceButtons: false,
 

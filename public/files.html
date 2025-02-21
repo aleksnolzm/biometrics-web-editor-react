@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Files</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <link rel="shortcut icon" href="#" />
+
+    <link href="filemanager/files.css" rel="stylesheet">
+</head>
+<body style="touch-action: pan-y">
+
+<div class="files"></div>
+
+<script src="filemanager/files.min.js"></script>
+<script>
+    var builder = parent.contentbox || parent._cb || parent.pagestudioai;
+    
+    var listFilesUrl = builder.listFilesUrl;
+    var listFoldersUrl = builder.listFoldersUrl;
+    var deleteFilesUrl = builder.deleteFilesUrl;
+    var moveFilesUrl = builder.moveFilesUrl;
+    var createFolderUrl = builder.createFolderUrl;
+    var uploadFilesUrl = builder.uploadFilesUrl;
+    var renameFileUrl = builder.renameFileUrl;
+    var getMmodelsUrl = builder.getMmodelsUrl;
+    var textToImageUrl = builder.textToImageUrl;
+    var upscaleImageUrl = builder.upscaleImageUrl;
+    var controlNetUrl = builder.controlNetUrl;
+    var saveTextUrl = builder.saveTextUrl;
+
+    var panelFullScreen;
+    if (typeof builder.assetPanelFullScreen !== 'undefined') {
+        panelFullScreen = builder.assetPanelFullScreen;
+    } else {
+        panelFullScreen = false;
+    }
+
+    var folderTree;
+    if (typeof builder.assetFolderTree !== 'undefined') {
+        folderTree = builder.assetFolderTree;
+    } else {
+        folderTree = false;
+    }
+
+    var panelReverse;
+    if (typeof builder.assetPanelReverse !== 'undefined') {
+        panelReverse = builder.assetPanelReverse;
+    } else {
+        panelReverse = false;
+    }
+
+    var filesOnly;
+    if (typeof builder.assetFilesOnly !== 'undefined') {
+        filesOnly = builder.assetFilesOnly;
+    } else {
+        filesOnly = false;
+    }
+    
+    var demoMode;
+    if (typeof builder.demoMode !== 'undefined') {
+        demoMode = builder.demoMode;
+    } else {
+        demoMode = false;
+    }
+
+    var refreshButton;
+    if (typeof builder.assetRefreshButton !== 'undefined') {
+        refreshButton = builder.assetRefreshButton;
+    } else {
+        refreshButton = true;
+    }
+
+    var showRelativeTime;
+    if (typeof builder.assetShowRelativeTime !== 'undefined') {
+        showRelativeTime = builder.assetShowRelativeTime;
+    } else {
+        showRelativeTime = false;
+    }
+
+    var locale;
+    if (typeof builder.assetLocale !== 'undefined') {
+        locale = builder.assetLocale;
+    } else {
+        locale = 'default';
+    }
+    
+    var dateShortOptions;
+    if (typeof builder.assetDateShortOptions !== 'undefined') {
+        dateShortOptions = builder.assetDateShortOptions;
+    } else {
+        dateShortOptions = { // Used in file list
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+        };
+    }
+    
+    var dateLongOptions;
+    if (typeof builder.assetDateLongOptions !== 'undefined') {
+        dateLongOptions = builder.assetDateLongOptions;
+    } else {
+        dateLongOptions = { // Used in file info
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric',
+        };
+    }
+
+    var allowedFileTypes;
+    if (typeof builder.assetAllowedFileTypes !== 'undefined') {
+        allowedFileTypes = builder.assetAllowedFileTypes;
+    } else {
+        allowedFileTypes = [
+            'image/jpeg',
+            'image/png',
+            'image/gif',
+            'image/webp',
+            'image/bmp',
+            'image/tiff',
+            'image/svg+xml',
+            'image/vnd.adobe.photoshop',
+            'video/mp4',
+            'video/quicktime',
+            'audio/mpeg',
+            'application/json',
+            'application/font',
+            'application/pdf',
+            'application/zip',
+            'application/x-rar-compressed',
+            'application/msword',
+            'application/rtf',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'text/csv',
+            'text/markdown',
+            'text/plain',
+            'text/css',
+            'text/javascript',
+            'text/html',
+        ];
+    }
+
+    const elm = document.querySelector('.files');
+    window.fileManager = new Files(elm, {
+
+        defaultHeaders: builder.defaultHeaders,
+        
+        listFilesUrl,
+        listFoldersUrl,
+        deleteFilesUrl,
+        moveFilesUrl,
+        createFolderUrl,
+        uploadFilesUrl,
+        renameFileUrl,
+        getMmodelsUrl,
+        textToImageUrl,
+        upscaleImageUrl,
+        controlNetUrl,
+        saveTextUrl,
+
+        panelFullScreen,
+        
+        folderTree,
+        panelReverse,
+        filesOnly,
+        refreshButton,
+        allowedFileTypes,
+        showRelativeTime,
+        locale,
+        dateShortOptions,
+        dateLongOptions,
+
+        filePicker: true,
+
+        onSelect: (url, e)=>{
+            parent.selectAsset(url);
+            parent.focus();
+
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            
+            if(parent.pagestudioai) parent.closeAsset();
+        },
+        onCancel: ()=>{
+            if(parent.pagestudioai) {
+                parent.closeAsset();
+                return;
+            }
+
+            const iframe = frameElement;
+            const otherActiveModal = parent.document.querySelector('.is-modal.flex')||document.querySelector('.is-modal.flex');
+            if(otherActiveModal) return; // do not close if another modal is active
+            const modal = iframe.closest('.is-modal');
+            parent.hideModal(modal);
+        },
+    });
+
+    if (builder.viewUrl) {
+        window.fileManager.viewUrl = builder.viewUrl;
+    }
+
+    if (builder.viewFileUrl) {
+        window.fileManager.viewFileUrl = builder.viewFileUrl;
+    }
+
+
+    // Optional Theme/Style Stuff (if used with ContentBuilder/ContentBox)
+    function applyParentStyles() {
+        var cssString = `
+            body {
+                background: ${parent._cb.styleModalBackground};
+                color: ${parent._cb.styleModalColor};
+                margin: 0;
+            }
+            .is-pop {
+                background: ${parent._cb.styleModalBackground};
+                color: ${parent._cb.styleModalColor};
+                box-shadow: 0px 15px 20px 0px rgb(95 95 95 / 35%);
+            }
+            .light .file-list,
+            .colored .file-list,
+            .colored-dark .file-list  {
+                border-color: transparent;
+            }
+            a {
+                color: ${parent._cb.styleModalColor};
+            }
+            button {
+                /* background-color: ${parent._cb.styleButtonClassicBackground}; 
+                color: ${parent._cb.styleButtonClassicColor}; */
+            }
+            .light button,
+            .colored button,
+            .colored-dark button  {
+                background-color: ${parent._cb.styleButtonClassicBackground};
+            }
+            button svg { 
+                fill: ${parent._cb.styleModalColor};      
+            }
+
+            input[type="text"] {
+                /* color: ${parent._cb.styleInputColor};
+                background-color: ${parent._cb.styleInputBackground}; 
+                border: none; */
+            }
+            .light input[type="text"],
+            .colored input[type="text"],
+            .colored-dark input[type="text"],
+            .light textarea,
+            .colored textarea,
+            .colored-dark textarea,
+            .light select,
+            .colored select,
+            .colored-dark select {
+                color: ${parent._cb.styleInputColor};
+                background-color: ${parent._cb.styleInputBackground}; 
+                border: none;
+            }
+            
+            input[type=text]:focus {
+                outline: #3e93f7 2px solid;
+                outline-offset: 0;
+                box-shadow: none;
+            }
+            a:focus,
+            button:focus {
+                outline:none; 
+            }
+            a:focus-visible,
+            button:focus-visible {
+                outline: #3e93f7 2px solid; 
+                outline-offset: 2px;
+            }
+
+            /* Scrollbar for modal */
+
+            /* Darker color, because background for snippet thumbnails is always light. */
+            .dark * {
+                scrollbar-width: thin;
+                scrollbar-color: rgb(78 78 78 / 62%) auto;
+            }
+            .dark *::-webkit-scrollbar {
+                width: 12px;
+            }
+            .dark *::-webkit-scrollbar-track {
+                background: transparent;
+            }
+            .dark *::-webkit-scrollbar-thumb {
+                background-color:rgb(78 78 78 / 62%);
+            } 
+
+            .colored-dark * {
+                scrollbar-width: thin;
+                scrollbar-color: rgb(100, 100, 100) auto;
+            }
+            .colored-dark *::-webkit-scrollbar {
+                width: 12px;
+            }
+            .colored-dark *::-webkit-scrollbar-track {
+                background: transparent;
+            }
+            .colored-dark *::-webkit-scrollbar-thumb {
+                background-color:rgb(100, 100, 100);
+            } 
+
+            .colored * {
+                scrollbar-width: thin;
+                scrollbar-color: rgba(0, 0, 0, 0.4) auto;
+            }
+            .colored *::-webkit-scrollbar {
+                width: 12px;
+            }
+            .colored *::-webkit-scrollbar-track {
+                background: transparent;
+            }
+            .colored *::-webkit-scrollbar-thumb {
+                background-color: rgba(0, 0, 0, 0.4);
+            } 
+
+            .light * {
+                scrollbar-width: thin;
+                scrollbar-color: rgba(0, 0, 0, 0.4) auto;
+            }
+            .light *::-webkit-scrollbar {
+                width: 12px;
+            }
+            .light *::-webkit-scrollbar-track {
+                background: transparent;
+            }
+            .light *::-webkit-scrollbar-thumb {
+                background-color: rgba(0, 0, 0, 0.4);
+            } 
+
+            
+            .div-folders li > button:hover,
+            .div-tree li > button:hover { background: ${parent._cb.styleButtonClassicBackground} }
+            .div-tree li > button.active { background: ${parent._cb.styleButtonClassicBackground} }
+            
+            .colored .panel .tabs button.active,
+            .light .panel .tabs button.active { border-color: transparent }
+
+            .colored .is-rangeslider,
+            .light .is-rangeslider { background: ${parent._cb.styleButtonClassicBackground} }
+
+            .colored .file-list li a > span:first-child button,
+            .light .file-list li a > span:first-child button { background: rgb(255 255 255 / 49%) }
+        `;
+        var style = document.createElement("style");
+        style.type = "text/css";
+        style.innerHTML = cssString;
+        document.getElementsByTagName("head")[0].appendChild(style);
+
+        if(parent._cb.styleColoredDark) {
+            document.body.setAttribute('class', 'colored-dark');
+        } else if(parent._cb.styleDark) {
+            document.body.setAttribute('class', 'dark');
+        } else if(parent._cb.styleColored) {
+            document.body.setAttribute('class', 'colored');
+        } else if(parent._cb.styleLight) {
+            document.body.setAttribute('class', 'light');
+        } else {
+            document.body.setAttribute('class', '');
+        }
+
+    }
+
+    if(parent._cb) { // If used with ContentBuilder/ContentBox
+
+      applyParentStyles();
+
+      const handleKeyDown = (e) => {
+          if(e.keyCode === 27) { // escape key
+            const iframe = frameElement;
+            const otherActiveModal = parent.document.querySelector('.is-modal.flex')||document.querySelector('.is-modal.flex');
+            if(otherActiveModal) return; // do not close if another modal is active
+            const modal = iframe.closest('.is-modal');
+            parent.hideModal(modal);
+          }
+      }
+      document.addEventListener('keydown', handleKeyDown);
+    }
+</script>
+</body>
+</html>

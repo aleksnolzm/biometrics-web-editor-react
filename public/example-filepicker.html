@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Files</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <link rel="shortcut icon" href="#" />
+    <style>
+        .modal-files {
+            display:none;position:fixed; top:50px; left:50px; right: 50px; bottom: 50px; background: #fff;border-radius: 6px;
+            box-shadow: 0px 15px 30px 0px rgba(95, 95, 95, 0.39);
+        }
+        .modal-files iframe {
+            position:absolute; top:0; left:0; width:100%;height:100%;border:none;
+        }
+        .preview img {
+            max-width:300px;max-height:300px;
+        }
+    </style>
+</head>
+<body>
+
+<input class="inp-file" type="text">
+<button class="btn-selectfile">Select File</button>
+<br><br>
+<div class="preview"></div>
+
+<div class="modal-files">
+    <iframe src="example-modal.html"></iframe>
+</div>
+
+<script>
+    const btnSelectFile = document.querySelector('.btn-selectfile');
+    btnSelectFile.addEventListener('click', ()=>{
+        open();
+    });
+
+    // Create a function to be called by the example-modal.html
+    function selectFile(url) {
+        const inpFile = document.querySelector('.inp-file')
+        inpFile.value = url;
+
+        const ext = url.split('.').pop().toLowerCase();
+        if(ext==='jpg'||ext==='png'||ext==='giv'){
+
+            const preview = document.querySelector('.preview');
+            preview.innerHTML = `<img src="${url}">`;
+        }
+    }
+
+    const modalFiles = document.querySelector('.modal-files')
+    function open() {
+        modalFiles.style.display = 'block';
+    }
+    function close() {
+        modalFiles.style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
