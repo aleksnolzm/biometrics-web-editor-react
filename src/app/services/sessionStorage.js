@@ -32,4 +32,4 @@ class SessionStorageManager {
   }
 }
 
-export default SessionStorageManager;torageManager;
+export default SessionStorageManager;
