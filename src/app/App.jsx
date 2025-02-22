@@ -40,8 +40,6 @@ function App() {
     setConfigs(storageConfigs);
   }, []);
 
-  useEffect(() => { console.log(configs)} ,[configs]);
-
   return (configs !== undefined && !_.isEmpty(configs) &&
     <Editor
       domain={configs?.domain}
