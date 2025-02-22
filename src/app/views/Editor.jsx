@@ -1,5 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import { useSearchParams } from "react-router-dom";
+import { EditorConfigs } from "app/views/Configs";
 import ContentBox from '@innovastudio/contentbox';
 import '../styles/contentbox.css';
 import '../styles/contentbuilder.css';
@@ -7,9 +8,10 @@ import { useRequest } from "@main/hooks";
 import { getContentById, updateContent } from "app/api/editor";
 import { HTML_TEMPLATE } from "app/views/Defaults";
 import {emitCustomMessage, emitErrorMessage} from "app/utils/eventMessagesHandler";
-import Loader from "app/views/Components/Loader";
+import LoaderScreen from "app/views/Components/LoaderScreen/LoaderScreen";
+import {createBasePath} from "app/utils/url";
+import EmptyScreen from "app/views/Components/EmptyScreen/EmptyScreen";
 
-const EVENT_IDENTIFIER = 5849301;
 const DEFAULT_DATA = {
   html: HTML_TEMPLATE,
   mainCss: '',
@@ -17,13 +19,16 @@ const DEFAULT_DATA = {
   title: 'Sin título',
 };
 
-const IS_LOCALHOST = window.origin.includes('localhost:3107');
-const ASSETS_PATH = IS_LOCALHOST ? '/files.html' : '/editor/files.html';
-
-const Editor = () => {
+const Editor = (
+  {
+    domain,
+    prefix,
+    module,
+    identifier = 11111111,
+  }) => {
+  const basePath = createBasePath(domain, prefix);
   const [searchParams] = useSearchParams();
-  const externalId = searchParams.get('id');
-  const externalModule = searchParams.get('module');
+  const previousId = searchParams.get('id');
   const builderRef = useRef(null);
 
   const [isReady, setIsReady] = useState(false);
@@ -31,10 +36,10 @@ const Editor = () => {
   const [topbarOpacity, setTopbarOpacity] = useState(0);
 
   const { makeRequest: tryShow, response: responseShow, isLoading: isLoadingShow } = useRequest(getContentById, {
-    onError: (err) => emitErrorMessage(EVENT_IDENTIFIER, err),
+    onError: (err) => emitErrorMessage(identifier, err),
   });
   const { makeRequest: tryUpdate, response: responseUpdate, isLoading: isLoadingUpdate } = useRequest(updateContent, {
-    onError: (err) => emitErrorMessage(EVENT_IDENTIFIER, err),
+    onError: (err) => emitErrorMessage(identifier, err),
   });
 
   const handleLoadData = (currentRes) => {
@@ -57,12 +62,12 @@ const Editor = () => {
     const { isOk, successContent } = currentRes;
     console.log(successContent);
     if (!isOk) return;
-    emitCustomMessage(EVENT_IDENTIFIER, 'update', successContent);
+    emitCustomMessage(identifier, 'update', successContent);
   }
 
   const handleOnShow = () => {
     console.log('handleOnShow');
-    tryShow(externalId, externalModule)
+    tryShow(previousId, module)
       .then((response) => {
         if (!response) return;
         handleResponseShow(response);
@@ -72,7 +77,7 @@ const Editor = () => {
 
   const handleOnUpdate = (data) => {
     console.log('handleOnUpdate');
-    tryUpdate(data, externalId, externalModule)
+    tryUpdate(data, previousId, module)
       .then((response) => {
         if (!response) return;
         handleResponseUpdate(response);
@@ -81,11 +86,11 @@ const Editor = () => {
   };
 
   const handleOnBack = () => {
-    emitCustomMessage(EVENT_IDENTIFIER, 'back');
+    emitCustomMessage(identifier, 'back');
   };
 
   const handleOnSave = (e) => {
-    emitCustomMessage(EVENT_IDENTIFIER, 'before-save');
+    emitCustomMessage(identifier, 'before-save');
     const recordedLayout = {
       html: builderRef.current.html(),
       mainCss: builderRef.current.mainCss(),
@@ -126,7 +131,7 @@ const Editor = () => {
     let sectionCss = builderRef.current.sectionCss();
     localStorage.setItem('preview-sectioncss', sectionCss);
 
-    emitCustomMessage(EVENT_IDENTIFIER, 'preview');
+    emitCustomMessage(identifier, 'preview');
   };
 
   const handleOnTogglePanel = () => {
@@ -137,94 +142,29 @@ const Editor = () => {
   const handleOnStart = (ev) => {
     setTopbarOpacity(1);
     setIsReady(true);
-    emitCustomMessage(EVENT_IDENTIFIER, 'start');
+    emitCustomMessage(identifier, 'start');
   };
 
   useEffect(() => {
     if (!builderRef.current) {
       builderRef.current = new ContentBox({
-
-        canvas: true,
-        previewURL: 'preview.html',
-        controlPanel: true,
-        iframeSrc: 'blank.html',
-        topSpace: true,
-        iframeCentered: true,
         onStart: handleOnStart,
-
-        // onImageSelectClick: (event) => {
-        //   console.log('onImageSelectClick', event);
-        //   return event;
-        //
-        // },
-        // onImageBrowseClick: (event) => {
-        //   console.log('onImageBrowseClick', event);
-        //   return event;
-        //
-        // },
-        // onImageUpload: (event) => {
-        //   console.log('onImageUpload', event.target)
-        //
-        // },
-        //
-        // onMediaSelectClick: (event) => {
-        //   console.log('onMediaSelectClick', event);
-        //
-        // },
-        // onMediaUpload: (event) => {
-        //   console.log('onMediaUpload', event);
-        //
-        // },
-        //
-        // onFileSelectClick: (event) => {
-        //   console.log('onFileSelectClick', event);
-        //
-        // },
-        // onFileUpload: (event) => {
-        //   console.log('onFileUpload', event);
-        //
-        // },
-
-        toggleDeviceButton: false,
-        deviceButtons: false,
-
-        // Default file/image picker
-        imageSelect: ASSETS_PATH,
-        videoSelect: ASSETS_PATH,
-        audioSelect: ASSETS_PATH,
-        fileSelect: ASSETS_PATH,
-        mediaSelect: ASSETS_PATH,
-
-        // Template Sets
-        templates: [
-          {
-            url: 'assets/templates-simple/templates.js',
-            path: 'assets/templates-simple/',
-            pathReplace: [],
-            numbering: true,
-            showNumberOnHover: true,
-          },
-          {
-            url: 'assets/templates-quick/templates.js',
-            path: 'assets/templates-quick/',
-            pathReplace: [],
-            numbering: true,
-            showNumberOnHover: true,
-          },
-          {
-            url: 'assets/templates-animated/templates.js',
-            path: 'assets/templates-animated/',
-            pathReplace: [],
-            numbering: true,
-            showNumberOnHover: true,
-          },
-        ],
-
-        slider: 'glide',
-        navbar: true,
+        // ----- Endpoints
+        listFilesUrl: `${basePath}/editor/file/listfiles`,
+        listFoldersUrl: `${basePath}/editor/file/listfolders`,
+        deleteFilesUrl: `${basePath}/editor/file/deletefiles`,
+        moveFilesUrl: `${basePath}/editor/file/movefiles`,
+        createFolderUrl: `${basePath}/editor/file/createfolder`,
+        uploadFilesUrl: `${basePath}/editor/file/uploadfiles`,
+        renameFileUrl: `${basePath}/editor/file/renamefile`,
+        getModelsUrl: `${basePath}/editor/file/getmodels`,
+        textToImageUrl: `${basePath}/editor/file/texttoimage`,
+        upscaleImageUrl: `${basePath}/editor/file/upscaleimage`,
+        controlNetUrl: `${basePath}/editor/file/controlnet`,
+        saveTextUrl: `${basePath}/editor/file/savetext`,
+        ...EditorConfigs
       });
 
-      // Adding more ContentBox features on the left sidebar (Animation & Timeline editor buttons)
       builderRef.current.addButton({
         'pos': 2,
         'title': 'Agregar transición a contenido',
@@ -254,13 +194,20 @@ const Editor = () => {
   }, []);
 
   useEffect(() => {
-    if (externalId === null || externalId === undefined) return;
+    if (previousId === null || previousId === undefined) {
+      handleLoadData(DEFAULT_DATA);
+      return;
+    }
     handleOnShow();
-  }, [externalId]);
+  }, [previousId]);
 
   return (
-      isLoadingShow ? (
-        <Loader />
+      isLoadingShow && !isReady ? (
+        <LoaderScreen />
+      ) : builderRef.current === null ? (
+        <EmptyScreen>
+          No se pudo cargar el editor.
+        </EmptyScreen>
       ) : (
       <div className="builder-ui keep-selection custom-topbar" style={{opacity:topbarOpacity}} data-tooltip>
         <div style={{ display: 'flex', flexDirection: 'center', alignItems: 'center', textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}>

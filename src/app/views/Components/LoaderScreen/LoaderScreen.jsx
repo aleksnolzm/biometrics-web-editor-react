@@ -1,7 +1,7 @@
-import './Loader.css';
+import './LoaderScreen.css';
 import { AppleLoader } from "@main/components/AppleLoader/AppleLoader";
 
-const Loader = () => {
+const LoaderScreen = () => {
   return (
     <div className="loader-container">
       <div className="loader-wrapper">
@@ -12,4 +12,4 @@ const Loader = () => {
   )
 }
 
-export default Loader;
+export default LoaderScreen;
